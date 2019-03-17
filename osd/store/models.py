@@ -22,6 +22,7 @@ class Category(models.Model):
 
 # slug used for url (e.g. http://localhost/store/golf-umbrella -> golf-umbrella is a slug for product name Golf Umbrella)
 class Product(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250,unique=True)
     slug = models.SlugField(max_length=250, unique=True)
     description = models.TextField(blank=True)
