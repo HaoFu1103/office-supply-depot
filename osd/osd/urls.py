@@ -23,6 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('store/', include('store.urls')),
+    path('search/', include('search_app.urls')),
+    path('cart/', include('cart.urls')),
 ]
 
 #map static and media urls when debug is enabled
