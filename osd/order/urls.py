@@ -3,7 +3,7 @@ from . import views
 
 app_name = 'order'
 
-url_patterns = [
+urlpatterns = [
     path('thanks/<int:order_id>/', views.thanks, name='thanks'),
 ]
 
