@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'search_app',
     'cart',
     'order',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,5 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR,'static'),)
 # folder for media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'static','media')
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
