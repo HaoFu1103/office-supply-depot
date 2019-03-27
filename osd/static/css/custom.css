@@ -12,6 +12,11 @@ body {
   letter-spacing: .2em;
   text-transform: uppercase;
 }
+
+.checkbox-inline {
+  display: block;
+  width: 40px;
+}
 /****Footer****/
 .my_footer {
   background-color: #f8f9fa;
@@ -49,7 +54,7 @@ body {
 .my_bottom_margin {
   margin-bottom: 10px;
 }
-. card-body h4 {
+.card-body h4 {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: .2em;

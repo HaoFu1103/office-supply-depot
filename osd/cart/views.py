@@ -54,7 +54,6 @@ def cart_detail(request, total=0, counter=0, cart_items = None):
                 order_details = Order.objects.create(
                     cus_id=cus_id,
                     ship_address=ship_add
-
                 )
                 for order_item in cart_items:
                     oi = OrderDetail.objects.create(
@@ -96,3 +95,25 @@ def full_remove(request, product_id):
     cart_item = CartItem.objects.get(product=product, cart=cart)
     cart_item.delete()
     return redirect('cart:cart_detail')
+
+def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, cart_items = None, deliveryCost1=0, deliveryCost2=0):
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart, active=True)
+        for cart_item in cart_items:
+            costTotal += (cart_item.product.price * cart_item.quantity)
+            counter += cart_item.quantity
+        for cart_item in cart_items:
+            weightTotal += (cart_item.product.weight * cart_item.quantity)
+            counter += cart_item.quantity
+        if costTotal <= 100 and weightTotal <= 15:
+            deliveryCost1=20
+        elif costTotal <= 100 and weightTotal > 15:
+            deliveryCost2=20
+        else:
+            deliveryCost1=0
+            deliveryCost2=0
+        overallTotal = costTotal + deliveryCost1
+    except ObjectDoesNotExist:
+        pass
+    return render(request, 'checkout.html', dict(cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
