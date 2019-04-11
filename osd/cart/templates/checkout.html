@@ -25,12 +25,11 @@
       <div class="text-center">
         <br>
         <h1 class="text-center.my_tittle">
-          Calculating delivery cost
+          Calculating Total
         </h1>
         <br>
       </div>
     </div>
-
     <div class="row mx-auto">
       <div class="col-12 col-sm-12 col-md-12 col-lg-6 text-center">
         <table class="table my_custom_table">
@@ -42,10 +41,10 @@
             </tr>
           </thead>
           <tbody>
-            {% for cart_item in cart_items %}
+              {% for cart_item in cart_items %}
               <tr>
                 <td>
-                  <a href="cart_item.product.get_absolute_url"><img src="{{cart_item.product.image.url}}" alt="" class="float-left rounded custom_image"></a>
+                  <img src="{{cart_item.product.image.url}}" alt="" class="float-left rounded custom_image"></a>
                 </td>
                 <td class="text-left">
                   {{cart_item.product.name}}
@@ -62,23 +61,11 @@
                   ${{cart_item.sub_total}}
                 </td>
               </tr>
-            {% endfor %}
+              {% endfor %}
           </tbody>
-        </table>
-      </div>
-      <div class="col-12 col-sm-12 col-md-12 col-lg-6 text-center">
-        <table class="table my_custom_table">
-          <thead class="my_custom_thead">
-            <tr>
-              <th colspan="5">
-                Subtotal
-              </th>
-            </tr>
-          </thead>
-            <tbody>
+          <tbody>
             <tr>
               <td class="text-left">
-                <br>
                 Total Price: ${{ costTotal }}
                 <br>
                 Items total weight: ${{ weightTotal }}lbs
@@ -103,19 +90,94 @@
                 </div>
               </li>
               <br>
-              <label class="checkbox-inline">
+              <label class="checkbox">
                 You can choose surcharge by paying $25 and check right box. <input type="checkbox" value="">
               </label>
-
-                {% endif %}
-            </tr>
+              {% endif %}
               </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-12 col-sm-12 col-md-12 col-lg-6 text-center">
+        <table class="table my_custom_table">
+          <thead class="my_custom_thead">
+            <tr>
+              <th colspan="5">
+                Address
+              </th>
+            </tr>
+          </thead>
+            <tbody>
+            <tr>
+              <td class="text-left">
+               <div class="row">
+                <form  class="form-horizontal" method="post">
+                  {% csrf_token %}
+                <!--<p>{{ form }}</p> -->
+                  <!-- full-name input-->
+                <div class="control-group">
+                    <label class="control-label">Full Name</label>
+                    <div class="controls">
+                        <input id="full-name" name="full-name" type="text" placeholder="full name"
+                        class="input-xlarge" size="55">
+                        <p class="help-block"></p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Address Line 1</label>
+                    <div class="controls">
+                        <input id="address-line1" name="address-line1" type="text" placeholder="address line 1"
+                        class="input-xlarge" size="55">
+                        <p class="help-block">Street address</p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Address Line 2</label>
+                    <div class="controls">
+                        <input id="address-line2" name="address-line2" type="text" placeholder="address line 2"
+                        class="input-xlarge" size="55">
+                        <p class="help-block">Apartment, suite , unit, building, floor, etc.</p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">City / Town</label>
+                    <div class="controls">
+                        <input id="city" name="city" type="text" placeholder="city" class="input-xlarge" size="55">
+                        <p class="help-block"></p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">State / Province / Region</label>
+                    <div class="controls">
+                        <input id="region" name="region" type="text" placeholder="state / province / region"
+                        class="input-xlarge" size="55">
+                        <p class="help-block"></p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Zip / Postal Code</label>
+                    <div class="controls">
+                        <input id="postal-code" name="postal-code" type="text" placeholder="zip or postal code"
+                        class="input-xlarge" size="55">
+                        <p class="help-block"></p>
+                    </div>
+                  </div>
+                </form>
+               </div>
+              </td>
+            </tr>
           </tbody>
           <tbody>
             <tr>
               <td class="text-left">
                 Your total is: <strong>${{ overallTotal }}</strong>
-                <button class="submit" style="float: right;">Proceed to Checkout</button>
+                <a href="{% url 'cart:thanks' %}" class="btn btn-secondary" style="float: right;">Proceed to Checkout</a>
               </td>
             </tr>
           </tbody>
@@ -123,5 +185,5 @@
       </div>
     </div>
     <br>
-  {% endif %}
+    {% endif %}
 {% endblock %}
