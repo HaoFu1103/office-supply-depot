@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from order.models import Order, OrderDetail
 
 
+
 # Create your views here.
 def _cart_id(request):
     cart = request.session.session_key
@@ -117,3 +118,8 @@ def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, ca
     except ObjectDoesNotExist:
         pass
     return render(request, 'checkout.html', dict(cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
+
+def thanks(request, order_id):
+    if order_id:
+        customer_order = get_object_or_404(Order, id=order_id)
+    return render(request, 'thanks.html', {'customer_order': customer_order})
