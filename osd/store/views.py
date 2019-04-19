@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from .models import Category,Product
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.contrib.auth.models import Group, User
@@ -38,6 +39,7 @@ def ProdCatDetail(request, c_slug, product_slug):
     except Exception as e:
         raise e
     return render(request, 'store/product.html', {'product':product})
+
 def signupView(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -50,6 +52,7 @@ def signupView(request):
     else:
         form = SignUpForm()
     return render(request, 'accounts/signup.html',{'form':form})
+
 def signinView(request):
     if request.method == 'POST':
         form =AuthenticationForm(data=request.POST)
@@ -65,6 +68,11 @@ def signinView(request):
     else:
         form = AuthenticationForm()
     return render(request, 'accounts/signin.html',{'form':form})
+
 def signoutView(request):
     logout(request)
     return redirect('signin')
+
+# Redirect to admin signin page
+def adminsigninView(request):
+    return HttpResponseRedirect('/admin')
