@@ -6,11 +6,6 @@ class Order(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Order Total')
     ship_address = models.CharField(max_length=250, blank=False)
     order_date = models.DateField(auto_now_add=True)
-    cus_id = models.IntegerField # need to link to USER db once USER db is created
-    status = models.BooleanField()
-    discount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Discounted Amount')
-    freight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Delivery Cost')
-    tax = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Tax')
 
     class Meta:
         db_table = 'Order'
