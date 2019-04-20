@@ -117,18 +117,16 @@
                   <table>
                     {{ form.as_table }}
                   </table>
-                  <td class="text-left">
+                  <div class="text-left">
                     Your total is: <strong>${{ overallTotal }}</strong>
-                    <form method="POST" class="btn btn-secondary" style="float: right;">
-                      {% csrf_token %}
-                        <button type="submit" class="save btn btn-default">Purchase</button>
-                    </form>
-                  </td>
+                        <button type="submit" class="btn btn-secondary" style="float: right;">Purchase</button>
+                  </div>
                 </form>
                </div>
               </td>
             </tr>
           </tbody>
+
         </table>
       </div>
     </div>
