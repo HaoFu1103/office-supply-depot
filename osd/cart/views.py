@@ -4,6 +4,7 @@ from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from order.models import Order, OrderDetail
 
+from order.forms import addressForm
 
 
 # Create your views here.
@@ -45,38 +46,7 @@ def cart_detail(request, total=0, counter=0, cart_items = None):
             counter += cart_item.quantity
     except ObjectDoesNotExist:
         pass
-    if request.method == 'POST':
-        try:
-            # create variables for order information
-            cus_id = request.POST['cus_id']
-            ship_add = request.POST['ship_address']
-            try:
-                # create order
-                order_details = Order.objects.create(
-                    cus_id=cus_id,
-                    ship_address=ship_add
-                )
-                for order_item in cart_items:
-                    oi = OrderDetail.objects.create(
-                        product=order_item.product.name,
-                        quantity=order_item.quantity,
-                        price=order_item.product.price,
-                        order=order_details
-                    )
-                    oi.save()
-                    # order stock reduced on order save
-                    products = Product.objects.get(id=order_item.product.id)
-                    products.stock = int(order_item.product.stock - order_item.quantity)
-                    products.save()
-                    order_item.delete()
-                    print('The order has been created')
-                return redirect('order:thanks', order_details.id)
-            except ObjectDoesNotExist:
-                pass
-        except Exception as e:
-            return False, e
-    # Process order information either here or on checkout
-    # Ep 20 has information on adding order information to DB
+
     return render(request, 'cart.html', dict(cart_items = cart_items, total = total, counter = counter))
 
 def cart_remove(request, product_id):
@@ -98,6 +68,8 @@ def full_remove(request, product_id):
     return redirect('cart:cart_detail')
 
 def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, cart_items = None, deliveryCost1=0, deliveryCost2=0):
+    if request.method == 'GET':
+        form = addressForm()
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_items = CartItem.objects.filter(cart=cart, active=True)
@@ -108,18 +80,43 @@ def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, ca
             weightTotal += (cart_item.product.weight * cart_item.quantity)
             counter += cart_item.quantity
         if costTotal <= 100 and weightTotal <= 15:
-            deliveryCost1=20
+            deliveryCost1 = 20
         elif costTotal <= 100 and weightTotal > 15:
-            deliveryCost2=20
+            deliveryCost2 = 20
         else:
-            deliveryCost1=0
-            deliveryCost2=0
+            deliveryCost1 = 0
+            deliveryCost2 = 0
         overallTotal = costTotal + deliveryCost1
     except ObjectDoesNotExist:
         pass
-    return render(request, 'checkout.html', dict(cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
-
-def thanks(request, order_id):
-    if order_id:
-        customer_order = get_object_or_404(Order, id=order_id)
-    return render(request, 'thanks.html', {'customer_order': customer_order})
+    if request.method == 'POST':
+        form = addressForm(request.POST)
+        if form.is_valid:
+            data = request.POST.copy()
+            shipping_address = data.get('street_address') + ' ' + data.get('apt_suite_other') + ', ' + data.get('city') + ', ' + data.get('state') + data.get('zip')
+            try:
+                try:
+                    current_order = Order.objects.create(
+                        total = overallTotal,
+                        ship_address = shipping_address
+                    )
+                    for order_item in cart_items:
+                        order_detail = OrderDetail.objects.create(
+                            product = order_item.product.name,
+                            quantity = order_item.quantity,
+                            price = order_item.product.price,
+                            order = current_order
+                        )
+                        order_detail.save()
+                        # order stock reduced on order save
+                        products = Product.objects.get(id=order_item.product.id)
+                        products.stock = int(order_item.product.stock - order_item.quantity)
+                        products.save()
+                        order_item.delete()
+                    request.session['order_id'] = current_order.order_id
+                    return redirect('order:thanks')
+                except ObjectDoesNotExist:
+                    pass
+            except Exception as e:
+                return False, e
+    return render(request, 'checkout.html', dict(form = form, cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))

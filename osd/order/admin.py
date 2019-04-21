@@ -16,14 +16,13 @@ class OrderItemAdmin(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['order_id', 'cus_id', 'ship_address', 'order_date']
-    list_display_links = ('order_id', 'cus_id')
-    search_fields = ['order_id', 'cus_id', 'ship_address']
-    readonly_fields = ['order_id', 'cus_id', 'total', 'ship_address', 'order_date', 'total',
-                       'status','discount', 'freight', 'tax']
+    list_display = ['order_id', 'ship_address', 'order_date']
+    list_display_links = ['order_id']
+    search_fields = ['order_id', 'ship_address']
+    readonly_fields = ['order_id', 'total', 'ship_address', 'order_date', 'total']
     fieldsets = [
-        ('ORDER INFORMATION',{'fields':['order_id', 'order_date', 'status']}),
-        ('BILLING INFORMATION',{'fields':['cus_id', 'total', 'discount', 'freight', 'tax']}),
+        ('ORDER INFORMATION',{'fields':['order_id', 'order_date']}),
+        ('BILLING INFORMATION',{'fields':['total']}),
         ('SHIPPING INFORMATION',{'fields':['ship_address']}),
     ]
 
