@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Order, OrderDetail
+from .models import Order, OrderDetail, Routing
+from django.db.models import Count, Sum, Min, Max
 
 # Register your models here.
 class OrderItemAdmin(admin.TabularInline):
@@ -35,3 +36,31 @@ class OrderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return True
+
+@admin.register(Routing)
+class RoutingAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/order/routing.html'
+    date_hierarchy = 'order_date'
+
+    def changelist_view(self, request, extra_context=None):
+        response = super(RoutingAdmin, self).changelist_view(
+            request,
+            extra_context=extra_context,
+        )
+
+        try:
+            qs = response.context_data['cl'].queryset
+        except (AttributeError, KeyError):
+            return response
+
+        response.context_data['summary'] = list(
+            qs
+            .all()
+        )
+
+
+
+        # TODO: make a list of dict (id, address)
+        # select the first place as start, calculate time with every other address. pick the closest one
+
+        return response

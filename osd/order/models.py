@@ -28,3 +28,9 @@ class OrderDetail(models.Model):
 
     def __str__(self):
         return self.product
+
+class Routing(Order):
+    class Meta:
+        proxy = True
+        verbose_name = 'Delivery Address Routing'
+        verbose_name_plural = 'Delivery Addresses Routing'
