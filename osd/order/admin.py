@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Order, OrderDetail, Routing
 from django.db.models import Count, Sum, Min, Max
+from .routing import calculate_best_routes
 
 # Register your models here.
 class OrderItemAdmin(admin.TabularInline):
@@ -53,14 +54,19 @@ class RoutingAdmin(admin.ModelAdmin):
         except (AttributeError, KeyError):
             return response
 
-        response.context_data['summary'] = list(
-            qs
-            .all()
-        )
+        queried_set = list(qs.all())
 
+        list_of_addresses = []
+        for row in queried_set:
+            lst = [row.order_id, row.ship_address]
+            list_of_addresses.append(lst)
 
+        ordered_set = calculate_best_routes(list_of_addresses)
 
-        # TODO: make a list of dict (id, address)
-        # select the first place as start, calculate time with every other address. pick the closest one
+        list_of_sorted_addresses = []
+        for curr_id in ordered_set:
+            list_of_sorted_addresses.append(qs.get(order_id=curr_id))
+
+        response.context_data['optimal_routes'] = list_of_sorted_addresses
 
         return response

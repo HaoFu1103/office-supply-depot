@@ -7,11 +7,11 @@
         <table>
             <thead>
                 <tr>
-                    <th> <div class="text"> <a href="#">Address </a> </div> </th>
+                    <th> <div class="text"> <a href="#">Optimal Routes </a> </div> </th>
                 </tr>
             </thead>
             <tbody>
-                {% for row in summary %}
+                {% for row in optimal_routes %}
                 <tr class="{% cycle 'row1' 'row2' %}">
                     <td> {{ row.ship_address }} </td>
                 </tr>
