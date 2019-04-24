@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
 from store.models import Product
 from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from order.models import Order, OrderDetail
-
 from order.forms import addressForm
 
 
@@ -15,26 +15,29 @@ def _cart_id(request):
     return cart
 
 def add_cart(request, product_id):
-    product = Product.objects.get(id=product_id)
-    try:
-        cart = Cart.objects.get(cart_id=_cart_id(request))
-    except Cart.DoesNotExist:
-        cart = Cart.objects.create(
-            cart_id = _cart_id(request)
-        )
-        cart.save(),
-    try:
-        cart_item = CartItem.objects.get(product=product, cart=cart)
-        if cart_item.quantity < cart_item.product.stock:
-            cart_item.quantity += 1
-        cart_item.save()
-    except CartItem.DoesNotExist:
-        cart_item = CartItem.objects.create(
-                    product = product,
-                    quantity = 1,
-                    cart = cart
-        )
-        cart_item.save()
+    if request.user.is_authenticated:
+        product = Product.objects.get(id=product_id)
+        try:
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+        except Cart.DoesNotExist:
+            cart = Cart.objects.create(
+                cart_id = _cart_id(request)
+            )
+            cart.save(),
+        try:
+            cart_item = CartItem.objects.get(product=product, cart=cart)
+            if cart_item.quantity < cart_item.product.stock:
+                cart_item.quantity += 1
+            cart_item.save()
+        except CartItem.DoesNotExist:
+            cart_item = CartItem.objects.create(
+                        product = product,
+                        quantity = 1,
+                        cart = cart
+            )
+            cart_item.save()
+    else:
+        return HttpResponseRedirect('/account/login')
     return redirect('cart:cart_detail')
 
 def cart_detail(request, total=0, counter=0, cart_items = None):
@@ -119,4 +122,5 @@ def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, ca
                     pass
             except Exception as e:
                 return False, e
+#        return render(request, 'signin.html', dict(cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
     return render(request, 'checkout.html', dict(form = form, cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
