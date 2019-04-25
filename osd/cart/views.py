@@ -15,6 +15,7 @@ def _cart_id(request):
     return cart
 
 def add_cart(request, product_id):
+
     if request.user.is_authenticated:
         product = Product.objects.get(id=product_id)
         try:
@@ -70,9 +71,13 @@ def full_remove(request, product_id):
     cart_item.delete()
     return redirect('cart:cart_detail')
 
-def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, cart_items = None, deliveryCost1=0, deliveryCost2=0):
+def check_out(request, Pickup=False, surcharge=False, overallTotal=0, costTotal=0, weightTotal=0, counter=0, cart_items = None, deliveryCost1=0, deliveryCost2=0):
     if request.method == 'GET':
         form = addressForm()
+    if request.GET.get('pickup'):
+        Pickup = True
+    if request.GET.get('surcharge'):
+        surcharge = True
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_items = CartItem.objects.filter(cart=cart, active=True)
@@ -82,14 +87,18 @@ def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, ca
         for cart_item in cart_items:
             weightTotal += (cart_item.product.weight * cart_item.quantity)
             counter += cart_item.quantity
-        if costTotal <= 100 and weightTotal <= 15:
+        if costTotal <= 100 and weightTotal <= 15 and Pickup == False:
             deliveryCost1 = 20
-        elif costTotal <= 100 and weightTotal > 15:
+        elif costTotal <= 100 and weightTotal > 15 and Pickup == False:
             deliveryCost2 = 20
-        else:
+        elif Pickup == True:
             deliveryCost1 = 0
             deliveryCost2 = 0
+        elif surcharge == True:
+            deliveryCost1 = 25
+
         overallTotal = costTotal + deliveryCost1
+
     except ObjectDoesNotExist:
         pass
     if request.method == 'POST':
@@ -122,5 +131,4 @@ def check_out(request, overallTotal=0, costTotal=0, weightTotal=0, counter=0, ca
                     pass
             except Exception as e:
                 return False, e
-#        return render(request, 'signin.html', dict(cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
-    return render(request, 'checkout.html', dict(form = form, cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2=deliveryCost2))
+    return render(request, 'checkout.html', dict(surcharge=surcharge, Pickup=Pickup,form = form,cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2 = deliveryCost2))

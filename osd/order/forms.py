@@ -1,8 +1,10 @@
-from order.models import Order
+from .models import Order
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django import forms
 
+
+    # full_name = forms.CharField(max_length=100, required=True)
 
 class addressForm(forms.Form):
     # full_name = forms.CharField(max_length=100, required=True)
@@ -14,4 +16,3 @@ class addressForm(forms.Form):
     # class Meta:
     #     model = Order
     #     fields = ('ship_address',)
-

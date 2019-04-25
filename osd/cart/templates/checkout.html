@@ -68,31 +68,36 @@
               <td class="text-left">
                 Total Price: ${{ costTotal }}
                 <br>
-                Items total weight: ${{ weightTotal }}lbs
+                Items total weight: {{ weightTotal }}lbs
                 <br>
-                {% if deliveryCost1 == 0 and weightTotal <= 15 %}
+                {% if deliveryCost1 == 0 and weightTotal <= 15 and Pickup == False %}
                 <br>
                 Your items will be delivered by drone in same day.
                 <br>
-                {% elif deliveryCost2 == 0 and weightTotal > 15 %}
-                <br>
+                {% elif deliveryCost2 == 0 and weightTotal > 15 and Pickup == False %}
                 Your items will be delivered by truck in two days.
+                <form  method="GET">
+                Or you can choose surcharge by paying $25 more to get same day delivery.
+                <input type="submit" name="surcharge" value="surcharge">
+                </form>
+                <br>
+                {% elif deliveryCost2 == 0 and  Pickup == True %}
+                <br>
+                Your chose pick up your items.
                 {% else %}
               </br>
                 You can choose delivery by truck or drone by paying $20.
-              <li class="navbar-nav mr-auto">
-                <div class="dropdown">
-                  <button class = "btn dropdown" style="background-color: white; border-color:#dee4ed" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Delivery Options</button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <a class="dropdown-item">Drone</a>
-                      <a class="dropdown-item">Truck</a>
-                    </div>
-                </div>
-              </li>
+                <select>
+                  <option value="Truck">Truck</option>
+                  <option value="Drone">Drone</option>
+                </select>
               <br>
-              <label class="checkbox">
-                You can choose surcharge by paying $25 and check right box. <input type="checkbox" value="">
-              </label>
+
+              <br>
+              <form  method="GET">
+                Your can choose:
+                <input type="submit" name="pickup" value="pickup">
+              </form>
               {% endif %}
               </td>
             </tr>
@@ -112,16 +117,17 @@
             <tr>
               <td class="text-left">
                <div class="row">
-                <form  class="form-horizontal" method="post">
+                <form  class="form-horizontal" type='submit' method="post">
                   {% csrf_token %}
                   <table>
                     {{ form.as_table }}
                   </table>
                   <div class="text-left">
                     Your total is: <strong>${{ overallTotal }}</strong>
-                        <button type="submit" class="btn btn-secondary" style="float: right;">Purchase</button>
                   </div>
+                    <input type="submit" class="btn btn-secondary" style="float: right;" value="Purchase" />
                 </form>
+
                </div>
               </td>
             </tr>
