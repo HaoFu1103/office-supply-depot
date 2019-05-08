@@ -21,6 +21,8 @@ def calculate_best_routes(list_addresses):
         waypoints.append(formatted_address)
         list_addresses[i][1] = formatted_address
 
+    waypoints = list(dict.fromkeys(waypoints))
+
     matrix_of_distance = gmaps.distance_matrix(startpoint, waypoints)
 
     distances_from_warehouse1 = matrix_of_distance['rows'][0]['elements']
@@ -46,11 +48,13 @@ def calculate_best_routes(list_addresses):
     routes = direction_result[0]['legs']
 
     sorted_address_ids = []
+    unique_addresses = set()
     for i, route in enumerate(routes):
         if i > 0:
             address = route['start_address']
             for curr_address in list_addresses:
-                if address == curr_address[1]:
+                if address == curr_address[1] and address not in unique_addresses:
                     sorted_address_ids.append(curr_address[0])
+                    unique_addresses.add(address)
 
     return sorted_address_ids
