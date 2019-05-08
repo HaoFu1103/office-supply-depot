@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from PIL import Image
+
 
 class Category(models.Model):
     name = models.CharField(max_length=250, unique=True)
@@ -22,6 +24,7 @@ class Category(models.Model):
 
 # slug used for url (e.g. http://localhost/store/golf-umbrella -> golf-umbrella is a slug for product name Golf Umbrella)
 class Product(models.Model):
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250,unique=True)
     slug = models.SlugField(max_length=250, unique=True)
@@ -45,3 +48,11 @@ class Product(models.Model):
 
     def __str__(self):
         return '{}'.format(self.name)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        img = Image.open(self.image.path)
+        output_size = (500, 500)
+        img.thumbnail(output_size)
+        img.save(self.image.path)
+
