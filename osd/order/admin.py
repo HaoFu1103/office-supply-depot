@@ -61,8 +61,9 @@ class RoutingAdmin(admin.ModelAdmin):
             lst = [row.order_id, row.ship_address]
             list_of_addresses.append(lst)
 
-        ordered_set = calculate_best_routes(list_of_addresses)
-
+        ordered_set, origin_warehouse = calculate_best_routes(list_of_addresses)
+        print(origin_warehouse)
+        response.context_data['origin_warehouse'] = origin_warehouse
         list_of_sorted_addresses = []
         for curr_id in ordered_set:
             list_of_sorted_addresses.append(qs.get(order_id=curr_id))

@@ -11,6 +11,9 @@
                 </tr>
             </thead>
             <tbody>
+                <tr class="{% cycle 'row1' 'row2' %}">
+                    <td> {{ origin_warehouse }} </td>
+                </tr>
                 {% for row in optimal_routes %}
                 <tr class="{% cycle 'row1' 'row2' %}">
                     <td> {{ row.ship_address }} </td>

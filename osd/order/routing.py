@@ -6,6 +6,7 @@ def calculate_best_routes(list_addresses):
     warehouse1_address = '1601 Coleman Ave, Santa Clara, CA 95050'
     warehouse2_address = '2201 Senter Rd, San Jose, CA 95112'
     origin_address = warehouse1_address
+
     destination_address = '1601 Coleman Ave, Santa Clara, CA 95050'
     mode_delivery = 'driving'
     startpoint = []
@@ -57,4 +58,4 @@ def calculate_best_routes(list_addresses):
                     sorted_address_ids.append(curr_address[0])
                     unique_addresses.add(address)
 
-    return sorted_address_ids
+    return sorted_address_ids, origin_address
