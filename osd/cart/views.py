@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
 from store.models import Product
+from django.http import HttpResponseRedirect
 from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from order.models import Order, OrderDetail
+
 from order.forms import addressForm
 
 
@@ -15,7 +16,6 @@ def _cart_id(request):
     return cart
 
 def add_cart(request, product_id):
-
     if request.user.is_authenticated:
         product = Product.objects.get(id=product_id)
         try:
@@ -24,7 +24,7 @@ def add_cart(request, product_id):
             cart = Cart.objects.create(
                 cart_id = _cart_id(request)
             )
-            cart.save(),
+            cart.save()
         try:
             cart_item = CartItem.objects.get(product=product, cart=cart)
             if cart_item.quantity < cart_item.product.stock:
