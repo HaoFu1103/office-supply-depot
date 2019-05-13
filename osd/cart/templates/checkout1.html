@@ -95,7 +95,7 @@
 
               <br>
               <form  method="GET">
-                You can choose:
+                Your can choose:
                 <input type="submit" name="pickup" value="pickup">
               </form>
               {% endif %}
@@ -109,7 +109,7 @@
           <thead class="my_custom_thead">
             <tr>
               <th colspan="5">
-                Address
+                Purchase
               </th>
             </tr>
           </thead>
@@ -119,9 +119,6 @@
                <div class="row">
                 <form  class="form-horizontal" type='submit' method="post">
                   {% csrf_token %}
-                  <table>
-                    {{ form.as_table }}
-                  </table>
                   <div class="text-left">
                     Your total is: <strong>${{ overallTotal }}</strong>
                   </div>

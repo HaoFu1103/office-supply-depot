@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
 from store.models import Product
+from django.http import HttpResponseRedirect
 from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from order.models import Order, OrderDetail
+
 from order.forms import addressForm
 
 
@@ -15,7 +16,6 @@ def _cart_id(request):
     return cart
 
 def add_cart(request, product_id):
-
     if request.user.is_authenticated:
         product = Product.objects.get(id=product_id)
         try:
@@ -24,7 +24,7 @@ def add_cart(request, product_id):
             cart = Cart.objects.create(
                 cart_id = _cart_id(request)
             )
-            cart.save(),
+            cart.save()
         try:
             cart_item = CartItem.objects.get(product=product, cart=cart)
             if cart_item.quantity < cart_item.product.stock:
@@ -76,6 +76,9 @@ def check_out(request, Pickup=False, surcharge=False, overallTotal=0, costTotal=
         form = addressForm()
     if request.GET.get('pickup'):
         Pickup = True
+        template = "checkout1.html"
+    else:
+        template = "checkout.html"
     if request.GET.get('surcharge'):
         surcharge = True
     try:
@@ -101,34 +104,50 @@ def check_out(request, Pickup=False, surcharge=False, overallTotal=0, costTotal=
 
     except ObjectDoesNotExist:
         pass
-    if request.method == 'POST':
+    if request.method == 'POST' and Pickup == False:
         form = addressForm(request.POST)
         if form.is_valid:
             data = request.POST.copy()
             shipping_address = data.get('street_address') + ' ' + data.get('apt_suite_other') + ', ' + data.get('city') + ', ' + data.get('state') + data.get('zip')
+            current_order = Order.objects.create(
+                total = overallTotal,
+                ship_address = shipping_address
+            )
+            for order_item in cart_items:
+                order_detail = OrderDetail.objects.create(
+                    product = order_item.product.name,
+                    quantity = order_item.quantity,
+                    price = order_item.product.price,
+                    order = current_order
+                )
+                order_detail.save()
+                # order stock reduced on order save
+                products = Product.objects.get(id=order_item.product.id)
+                products.stock = int(order_item.product.stock - order_item.quantity)
+                products.save()
+                order_item.delete()
+            request.session['order_id'] = current_order.order_id
+            return redirect('order:thanks')
+    else:
             try:
-                try:
-                    current_order = Order.objects.create(
-                        total = overallTotal,
-                        ship_address = shipping_address
+                current_order = Order.objects.create(
+                    total = overallTotal
+                )
+                for order_item in cart_items:
+                    order_detail = OrderDetail.objects.create(
+                        product = order_item.product.name,
+                        quantity = order_item.quantity,
+                        price = order_item.product.price,
+                        order = current_order
                     )
-                    for order_item in cart_items:
-                        order_detail = OrderDetail.objects.create(
-                            product = order_item.product.name,
-                            quantity = order_item.quantity,
-                            price = order_item.product.price,
-                            order = current_order
-                        )
-                        order_detail.save()
-                        # order stock reduced on order save
-                        products = Product.objects.get(id=order_item.product.id)
-                        products.stock = int(order_item.product.stock - order_item.quantity)
-                        products.save()
-                        order_item.delete()
-                    request.session['order_id'] = current_order.order_id
-                    return redirect('order:thanks')
-                except ObjectDoesNotExist:
-                    pass
-            except Exception as e:
-                return False, e
-    return render(request, 'checkout.html', dict(surcharge=surcharge, Pickup=Pickup,form = form,cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2 = deliveryCost2))
+                    order_detail.save()
+                    # order stock reduced on order save
+                    products = Product.objects.get(id=order_item.product.id)
+                    products.stock = int(order_item.product.stock - order_item.quantity)
+                    products.save()
+                    order_item.delete()
+                request.session['order_id'] = current_order.order_id
+                return redirect('order:thanks')
+            except ObjectDoesNotExist:
+                pass
+    return render(request, template, dict(surcharge=surcharge, Pickup=Pickup,form = form,cart_items = cart_items, overallTotal=overallTotal, costTotal = costTotal, weightTotal = weightTotal, counter = counter, deliveryCost1=deliveryCost1, deliveryCost2 = deliveryCost2))
