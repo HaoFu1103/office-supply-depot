@@ -58,8 +58,9 @@ class RoutingAdmin(admin.ModelAdmin):
 
         list_of_addresses = []
         for row in queried_set:
-            lst = [row.order_id, row.ship_address]
-            list_of_addresses.append(lst)
+            if row.ship_address:
+                lst = [row.order_id, row.ship_address]
+                list_of_addresses.append(lst)
 
         ordered_set, origin_warehouse = calculate_best_routes(list_of_addresses)
         print(origin_warehouse)
